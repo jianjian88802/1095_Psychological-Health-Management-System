@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.XinlilaoshiCollectionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.xinlilaoshi_id as xinlilaoshiId
+        ,a.yonghu_id as yonghuId
+        ,a.xinlilaoshi_collection_types as xinlilaoshiCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.XinlilaoshiCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+        ,xinlilaoshi.xinlilaoshi_name as xinlilaoshiName
+        ,xinlilaoshi.xinlilaoshi_phone as xinlilaoshiPhone
+        ,xinlilaoshi.xinlilaoshi_photo as xinlilaoshiPhoto
+        ,xinlilaoshi.xinlilaoshi_email as xinlilaoshiEmail
+        ,xinlilaoshi.xinlilaoshi_shanchang as xinlilaoshiShanchang
+        ,xinlilaoshi.xinlilaoshi_lvli as xinlilaoshiLvli
+        ,xinlilaoshi.xinlilaoshi_content as xinlilaoshiContent
+
+        FROM xinlilaoshi_collection  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+        left JOIN xinlilaoshi xinlilaoshi ON a.xinlilaoshi_id = xinlilaoshi.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.xinlilaoshiId != null and params.xinlilaoshiId != ''">
+                and (
+                    a.xinlilaoshi_id = #{params.xinlilaoshiId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.xinlilaoshiCollectionTypes != null and params.xinlilaoshiCollectionTypes != ''">
+                and a.xinlilaoshi_collection_types = #{params.xinlilaoshiCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断学生的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+                <!-- 判断心理老师的id不为空 -->
+            <if test=" params.xinlilaoshiIdNotNull != '' and params.xinlilaoshiIdNotNull != null and params.xinlilaoshiIdNotNull != 'null' ">
+                and a.xinlilaoshi_id IS NOT NULL
+            </if>
+            <if test=" params.xinlilaoshiName != '' and params.xinlilaoshiName != null and params.xinlilaoshiName != 'null' ">
+                and xinlilaoshi.xinlilaoshi_name like CONCAT('%',#{params.xinlilaoshiName},'%')
+            </if>
+            <if test=" params.xinlilaoshiPhone != '' and params.xinlilaoshiPhone != null and params.xinlilaoshiPhone != 'null' ">
+                and xinlilaoshi.xinlilaoshi_phone like CONCAT('%',#{params.xinlilaoshiPhone},'%')
+            </if>
+            <if test=" params.xinlilaoshiEmail != '' and params.xinlilaoshiEmail != null and params.xinlilaoshiEmail != 'null' ">
+                and xinlilaoshi.xinlilaoshi_email like CONCAT('%',#{params.xinlilaoshiEmail},'%')
+            </if>
+            <if test=" params.xinlilaoshiShanchang != '' and params.xinlilaoshiShanchang != null and params.xinlilaoshiShanchang != 'null' ">
+                and xinlilaoshi.xinlilaoshi_shanchang like CONCAT('%',#{params.xinlilaoshiShanchang},'%')
+            </if>
+            <if test=" params.xinlilaoshiLvli != '' and params.xinlilaoshiLvli != null and params.xinlilaoshiLvli != 'null' ">
+                and xinlilaoshi.xinlilaoshi_lvli like CONCAT('%',#{params.xinlilaoshiLvli},'%')
+            </if>
+            <if test=" params.xinlilaoshiContent != '' and params.xinlilaoshiContent != null and params.xinlilaoshiContent != 'null' ">
+                and xinlilaoshi.xinlilaoshi_content like CONCAT('%',#{params.xinlilaoshiContent},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
